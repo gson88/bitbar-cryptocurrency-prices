@@ -1,0 +1,11 @@
+{
+  "name": "ethereum-price",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.30s.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.1"
+  }
+}
