@@ -1,3 +1,7 @@
-A bitbar plugin to monitor ethereum price via cryptocompare.com:s API
+A bitbar plugin to monitor cryptocurrency prices via cryptocompare.com:s API
 
-# Don't forget to chmod +x src/filename.js
+## Make file runnable
+chmod +x src/filename.js
+
+## Create symlink to file in your plugins folder.
+ln -s path/to/project/main.30s.js path/to/plugins/ethereum-price.30s.js
