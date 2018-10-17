@@ -2,5 +2,6 @@
   { "name": "ETH", "price": "USD" },
   { "name": "LINK", "price": "USD" },
   { "name": "XLM", "price": "USD" },
-  { "name": "FUN", "price": "USD" }
+  { "name": "FUN", "price": "USD" },
+  { "name": "BTC", "price": "USD" }
 ]
