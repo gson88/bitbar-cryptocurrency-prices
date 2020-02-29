@@ -1,38 +1,53 @@
 #!/usr/bin/env /usr/local/bin/node
 
 const axios = require('axios');
-const symbols = require('./symbols');
-const { log, error } = console;
-const allSymbols = symbols.map(symbol => symbol.name);
-const allPrices = symbols.map(symbol => symbol.price).reduce((prices, price) => {
-  if (prices.indexOf(price) === -1) {
-    prices.push(price);
-  }
-  return prices;
-}, []);
+const bitbar = require('bitbar');
+const utils = require('./utils');
 
-//https://www.cryptocompare.com/api/#-api-data-coinlist-
-const API_URL = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${allSymbols.join(',')}&tsyms=${allPrices.join(',')}`;
+const getOptionsMenu = () => {
+  return {
+    text: 'Options',
+    submenu: [
+      {
+        text: 'Edit symbols',
+        bash: 'vim',
+        param1: utils.optionsPath,
+      },
+    ],
+  };
+};
 
-const displayData = (data) => {
-  let first = true;
-  for (let symbol of symbols) {
-    log(`${symbol.name}: $${data[symbol.name][symbol.price]}`);
-    if (first) {
-      log('---');
-      first = false;
-    }
-  }
+/** @param {CryptoPriceResponse} response */
+const print = response => {
+  const symbols = Object.keys(response);
+
+  /** @type {bitbar.Options[]} */
+  const rows = [
+    {
+      text: utils.getCryptoPriceRow(symbols[0], response[symbols[0]]),
+      dropdown: false,
+    },
+    bitbar.separator,
+    ...symbols.map(symbol => ({
+      text: utils.getCryptoPriceRow(symbol, response[symbol]),
+      href: utils.getGraphUrl(symbol, 'USD'),
+    })),
+  ];
+
+  rows.push(getOptionsMenu());
+
+  bitbar(rows);
 };
 
 const run = async () => {
+  const options = utils.getOptions();
+
   try {
-    const { data } = await axios.get(API_URL);
-    displayData(data);
+    const { data } = await axios.get(utils.getApiUrl(options));
+    print(data);
   } catch (exception) {
-    error(exception);
+    console.error(exception.message);
   }
 };
-
 
 run();
