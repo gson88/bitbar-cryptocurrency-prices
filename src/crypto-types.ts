@@ -1,6 +1,6 @@
-export interface Options {
-  symbols: string[];
-}
+import type { Options } from 'bitbar';
+
+export type BitbarRow = string | Options | symbol;
 
 export interface CryptoPrice {
   [k: string]: string;

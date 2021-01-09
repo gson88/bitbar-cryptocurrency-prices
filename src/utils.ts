@@ -1,31 +1,37 @@
 import fs from 'fs';
 import path from 'path';
-import bitbar, { BitbarOptions } from 'bitbar';
+import bitbar, { Options } from 'bitbar';
 import images from 'images';
 import type { AppOptions } from './app-types';
-import type { CryptoPrice, FullPriceAPIResponse } from './crypto-types';
+import type { BitbarRow, FullPriceAPIResponse } from './crypto-types';
 import defaultOptions from './default-options.json';
 
-//https://www.cryptocompare.com/api/#-api-data-coinlist-
-const API_PRICE_MULTI_URL =
-  'https://min-api.cryptocompare.com/data/pricemulti?fsyms=$symbolNames&tsyms=$currencies';
+// //https://www.cryptocompare.com/api/#-api-data-coinlist-
+// const API_PRICE_MULTI_URL =
+//   'https://min-api.cryptocompare.com/data/pricemulti?fsyms=$symbolNames&tsyms=$currencies';
+// const GRAPH_URL =
+//   'https://www.cryptocompare.com/coins/$symbolName/overview/$symbolCurrency';
+// const IMAGE_URL = 'https://www.cryptocompare.com$imageUrl';
+
 const API_PRICE_MULTI_FULL_URL =
   'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=$symbolNames&tsyms=$currencies';
-const GRAPH_URL =
-  'https://www.cryptocompare.com/coins/$symbolName/overview/$symbolCurrency';
-const IMAGE_URL = 'https://www.cryptocompare.com$imageUrl';
 
 const optionsPath = path.resolve(__dirname, '..', 'options/options.json');
 
-export const getGraphUrl = (symbol: string, currency: string): string => {
-  return GRAPH_URL.replace('$symbolName', symbol)
-    .replace('$symbolCurrency', currency)
-    .toLowerCase();
-};
-
-export const getImageUrl = (imagePath: string): string => {
-  return IMAGE_URL.replace('$imageUrl', imagePath).toLowerCase();
-};
+// export const getGraphUrl = (symbol: string, currency: string): string => {
+//   return GRAPH_URL.replace('$symbolName', symbol)
+//     .replace('$symbolCurrency', currency)
+//     .toLowerCase();
+// };
+// export const getImageUrl = (imagePath: string): string => {
+//   return IMAGE_URL.replace('$imageUrl', imagePath).toLowerCase();
+// };
+// export function getPriceMultiUrl(options: AppOptions): string {
+//   return API_PRICE_MULTI_URL.replace(
+//     '$symbolNames',
+//     options.symbols.join(',')
+//   ).replace('$currencies', 'USD');
+// }
 
 export function getOptions(): AppOptions {
   if (fs.existsSync(optionsPath)) {
@@ -36,13 +42,6 @@ export function getOptions(): AppOptions {
   return defaultOptions;
 }
 
-export function getPriceMultiUrl(options: AppOptions): string {
-  return API_PRICE_MULTI_URL.replace(
-    '$symbolNames',
-    options.symbols.join(',')
-  ).replace('$currencies', 'USD');
-}
-
 export function getPriceFullUrl(options: AppOptions): string {
   return API_PRICE_MULTI_FULL_URL.replace(
     '$symbolNames',
@@ -50,15 +49,15 @@ export function getPriceFullUrl(options: AppOptions): string {
   ).replace('$currencies', 'USD');
 }
 
-export function getCryptoPriceRow(symbol: string, row: CryptoPrice): string {
-  return `${symbol}: $${row['USD']}`;
-}
+// export function getCryptoPriceRow(symbol: string, row: CryptoPrice): string {
+//   return `${symbol}: $${row['USD']}`;
+// }
 
-export async function getCryptoPriceRowFromFull(
+export const mapResponseToRows = (
   symbol: string,
   response: FullPriceAPIResponse,
   enableSubmenu: boolean
-): Promise<BitbarOptions[]> {
+): BitbarRow[] => {
   const display = response.DISPLAY[symbol]['USD'];
   const raw = response.RAW[symbol]['USD'];
 
@@ -68,8 +67,7 @@ export async function getCryptoPriceRowFromFull(
   //   .encode('png')
   //   .toString('base64');
 
-  /** @type {BitbarOptions[]} */
-  const menuRows = [
+  const menuRows: BitbarRow[] = [
     {
       text: `${symbol}: $${raw.PRICE}`,
       color: 'white',
