@@ -3,5 +3,6 @@ package-lock.json
 
 #IDE
 .idea/
-
+.dist/
+.DS_Store
 options/

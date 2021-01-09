@@ -1,10 +1,9 @@
 #!/usr/bin/env /usr/local/bin/node
-
-const path = require('path');
-const axios = require('axios');
-const bitbar = require('bitbar');
-const images = require('images');
-const utils = require('./utils_old');
+import path from 'path';
+import axios from 'axios';
+import bitbar from 'bitbar';
+import images from 'images';
+import { getCryptoPriceRowFromFull, getOptions, getPriceFullUrl } from './utils';
 
 /**
  * @param {FullPriceAPIResponse} response
@@ -13,18 +12,24 @@ const utils = require('./utils_old');
 const getRowsFromMultiFull = async response => {
   const symbols = Object.keys(response.RAW);
 
-  const promises = await Promise.all(
-    symbols.reduce(async (acc, symbol) => {
-      acc.push(bitbar.separator);
-      const arr = await utils.getCryptoPriceRowFromFull(symbol, response, true);
-
-      acc = acc.concat(arr);
-      return acc;
-      // return utils.getCryptoPriceRowFromFull(symbol, response[ symbol ], true);
-    }, [])
-  );
-
-  const firstRow = utils.getCryptoPriceRowFromFull(
+  // const promises = symbols.reduce(
+  //   // @ts-ignore
+  //   async (acc, symbol: string) => {
+  //     // acc.push({
+  //     //   // @ts-ignore
+  //     //   text: bitbar.separator
+  //     // });
+  //     const rows = await utils.getCryptoPriceRowFromFull(symbol, response, true);
+  //
+  //     // @ts-ignore
+  //     acc = acc.concat(rows);
+  //     return acc;
+  //     // return utils.getCryptoPriceRowFromFull(symbol, response[ symbol ], true);
+  //   },
+  //   []
+  // );
+  //
+  const firstRow = await getCryptoPriceRowFromFull(
     symbols[0],
     response,
     false
@@ -63,12 +68,13 @@ const getRowsFromMultiFull = async response => {
   // ),);
 
   rows.push(bitbar.separator);
+  // @ts-ignore
   rows.push(utils.getOptionsMenu());
   return rows;
 };
 
 const run = async () => {
-  const options = utils.getOptions();
+  const options = getOptions();
   const img = images(path.resolve(__dirname, '../link.png'));
   const base64Img = img
     .resize(24, 24)
@@ -78,7 +84,7 @@ const run = async () => {
   // const b5 = Buffer.from(image2).toString('base64');
 
   try {
-    const { data } = await axios.get(utils.getPriceFullUrl(options));
+    const { data } = await axios.get(getPriceFullUrl(options));
     const rows = await getRowsFromMultiFull(data);
     bitbar(
       [
@@ -86,6 +92,7 @@ const run = async () => {
           image: base64Img,
           text: 'Hello',
         },
+        // @ts-ignore
       ].concat(rows)
     );
   } catch (exception) {
