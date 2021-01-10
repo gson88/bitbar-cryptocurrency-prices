@@ -1,12 +1,6 @@
 import bitbar from 'bitbar';
 import type { BitbarRow, FullPriceAPIResponse } from './types/api.types';
 
-export const getOptionsMenu = (optionsPath: string): bitbar.Options => ({
-  text: 'Edit symbols',
-  bash: 'vim',
-  param1: optionsPath,
-});
-
 const getSymbolRows = (
   symbol: string,
   currency: string,
@@ -15,15 +9,10 @@ const getSymbolRows = (
   const {
     CHANGEPCTHOUR: RAW_CHANGEPCTHOUR,
     CHANGEPCT24HOUR: RAW_CHANGEPCT24HOUR,
-    // LOW24HOUR: RAW_LOW24HOUR,
-    // HIGH24HOUR: RAW_HIGH24HOUR,
-    // PRICE: RAWPRICE,
   } = response.RAW[symbol][currency];
   const {
     CHANGEPCTHOUR,
     CHANGEPCT24HOUR,
-    // HIGH24HOUR,
-    // LOW24HOUR,
     PRICE: DISPLAYPRICE,
   } = response.DISPLAY[symbol][currency];
 
@@ -87,3 +76,9 @@ export const getRowsFromResponse = async (
 
   return [rows[1], bitbar.separator, ...rows];
 };
+
+export const getOptionsMenu = (optionsPath: string): bitbar.Options => ({
+  text: 'Edit symbols',
+  bash: 'vim',
+  param1: optionsPath,
+});
