@@ -5,5 +5,4 @@ package-lock.json
 .idea/
 dist/
 .DS_Store
-src/options/*
-!src/options/default-options.json
+.env
