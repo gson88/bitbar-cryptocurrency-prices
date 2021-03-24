@@ -1,0 +1,8 @@
+{
+  "symbols": ["BTC", "ETH"],
+  "ignore": ["USDT"],
+  "currency": "USD",
+  "binance": {
+    "minCoinWalletValue": 5
+  }
+}
