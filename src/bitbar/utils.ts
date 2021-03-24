@@ -1,6 +1,9 @@
 import bitbar, { Options } from 'bitbar';
+import he from 'he';
+import type { Thread } from '../types/4chan.types';
 import type { BitbarRow, FullPriceAPIResponse } from '../types/api.types';
 import type { CoinValue, UserCoinValues } from '../types/binance.types';
+import * as chanAPI from '../4chan/api';
 import * as options from '../options/options';
 
 const headerSize = 12;
@@ -30,6 +33,7 @@ const getSymbolRows = async (
   symbol: string,
   currency: string,
   response: FullPriceAPIResponse,
+  threads: Thread[],
   coinValues?: UserCoinValues
 ): Promise<BitbarRow[]> => {
   const {
@@ -45,7 +49,7 @@ const getSymbolRows = async (
   const coinValue = coinValues?.[symbol];
   const symbolValueSubmenu = getSymbolValueSubmenu(coinValue);
 
-  return [
+  const rows = [
     {
       text: `${symbol}: ${DISPLAYPRICE.replace(' ', '')}`,
       color: 'white',
@@ -63,6 +67,46 @@ const getSymbolRows = async (
       size: smallerSize,
     },
   ];
+
+  const interestingThreads = chanAPI.getThreadsThatInclude(threads, symbol);
+
+  if (interestingThreads.length === 0) {
+    return rows;
+  }
+
+  const quote = /<span class="quote">(.+)<\/span>/g;
+
+  const submenu = interestingThreads.map((thread) => {
+    const threadHref = `https://boards.4channel.org/biz/thread/${thread.no}`;
+    const commentRows =
+      thread.com
+        ?.split('<br>')
+        .filter(Boolean)
+        .map((row) => he.decode(row).replace(quote, '$1')) || [];
+
+    const title = thread.sub
+      ? he.decode(thread.sub)
+      : commentRows[0] || '(No title and message)';
+
+    return {
+      text: title.slice(0, 100).concat(` (${thread.replies})`),
+      size: headerSize,
+      href: threadHref,
+      submenu: commentRows.map((row) => ({
+        text: row.slice(0, 100),
+        size: headerSize,
+      })),
+    };
+  });
+
+  rows.push({
+    text: `Threads (${interestingThreads.length})`,
+    size: smallerSize,
+    color: 'gray',
+    submenu,
+  });
+
+  return rows;
 };
 
 export const getBitbarRows = async (params: {
@@ -70,6 +114,7 @@ export const getBitbarRows = async (params: {
   symbols: string[];
   currency: string;
   coinValues?: UserCoinValues;
+  threads: Thread[];
 }): Promise<BitbarRow[]> => {
   let rows: BitbarRow[] = [];
 
@@ -79,6 +124,7 @@ export const getBitbarRows = async (params: {
       symbol,
       params.currency,
       params.prices,
+      params.threads,
       params.coinValues
     );
     rows = rows.concat(row);

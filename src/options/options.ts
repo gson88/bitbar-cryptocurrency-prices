@@ -12,13 +12,17 @@ export const getOptions = (): AppOptions => {
     return defaultOptions;
   }
 
+  let writeFile = false;
   const existingOptions = require(optionsPath);
   Object.entries(defaultOptions).forEach(([field, value]) => {
     if (!existingOptions.hasOwnProperty(field)) {
+      writeFile = true;
       existingOptions[field] = value;
     }
   });
 
-  fs.writeFileSync(optionsPath, JSON.stringify(existingOptions, null, 2));
+  if (writeFile) {
+    fs.writeFileSync(optionsPath, JSON.stringify(existingOptions, null, 2));
+  }
   return existingOptions;
 };

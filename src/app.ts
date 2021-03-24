@@ -2,6 +2,8 @@ import bitbar from 'bitbar';
 import type { BitbarRow } from './types/api.types';
 import type { AppOptions } from './types/app.types';
 import type { FixedBalance } from './types/binance.types';
+import type { Thread } from './types/4chan.types';
+import * as chanAPI from './4chan/api';
 import * as binanceAPI from './binance/api';
 import * as bitbarUtils from './bitbar/utils';
 import * as cryptoCompareAPI from './cryptocompare/api';
@@ -10,16 +12,18 @@ import * as utils from './utils/utils';
 
 export const getRows = async (): Promise<BitbarRow[]> => {
   const appOptions = options.getOptions();
+  const threads = await chanAPI.getCatalogThreads();
 
   if (binanceAPI.hasEnvironmentKeys()) {
-    return getRowsWithBinance(appOptions);
+    return getRowsWithBinance(appOptions, threads);
   } else {
-    return getRowsWithoutBinance(appOptions);
+    return getRowsWithoutBinance(appOptions, threads);
   }
 };
 
 const getRowsWithBinance = async (
-  appOptions: AppOptions
+  appOptions: AppOptions,
+  threads: Thread[]
 ): Promise<BitbarRow[]> => {
   let symbols: string[];
   let userBalance: FixedBalance[];
@@ -49,10 +53,11 @@ const getRowsWithBinance = async (
   });
 
   const rows = await bitbarUtils.getBitbarRows({
-    currency: appOptions.currency,
+    threads,
+    coinValues,
     prices: priceData,
+    currency: appOptions.currency,
     symbols: sortedSymbols,
-    coinValues: coinValues,
   });
 
   rows.push(bitbar.separator, bitbarUtils.getTotalWalletValueRow(coinValues));
@@ -60,7 +65,8 @@ const getRowsWithBinance = async (
 };
 
 const getRowsWithoutBinance = async (
-  appOptions: AppOptions
+  appOptions: AppOptions,
+  threads: Thread[]
 ): Promise<BitbarRow[]> => {
   const priceData = await cryptoCompareAPI.getPrices(
     appOptions.symbols,
@@ -71,5 +77,6 @@ const getRowsWithoutBinance = async (
     prices: priceData,
     symbols: appOptions.symbols,
     currency: appOptions.currency,
+    threads,
   });
 };
