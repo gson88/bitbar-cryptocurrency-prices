@@ -64,13 +64,13 @@ const getUserBalances = (
 ): UserCoins => {
   const userBalance = allBalances
     .map<FixedBalance>((balance) => ({
-      coin: balance.asset,
+      asset: balance.asset,
       free: Number(balance.free),
       locked: Number(balance.locked),
     }))
     .filter((userCoin) => userCoin.free + userCoin.locked > minAmountOfCoins);
 
-  const symbols = userBalance.map((userCoin) => userCoin.coin);
+  const symbols = userBalance.map((userCoin) => userCoin.asset);
 
   return {
     symbols,

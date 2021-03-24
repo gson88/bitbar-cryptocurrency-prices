@@ -9,18 +9,19 @@ export const getValuesForUserCoins = (
   minCoinWalletValue = 0
 ): UserCoinValues => {
   return userBalance.reduce<UserCoinValues>((acc, balance) => {
-    const { coin, free } = balance;
-    if (!priceData.RAW[coin]) {
+    const { asset, free, locked } = balance;
+    if (!priceData.RAW[asset]) {
+      // We don't have any price data for this coin
       return acc;
     }
 
-    const coinPrice = Number(priceData.RAW[coin][currency].PRICE);
-    const quantity = free; //; + coin.locked;
+    const coinPrice = Number(priceData.RAW[asset][currency].PRICE);
+    const quantity = free + locked;
     const value = Math.round(coinPrice * quantity);
 
     if (value >= minCoinWalletValue) {
-      acc[coin] = {
-        coin,
+      acc[asset] = {
+        asset,
         value,
         quantity,
       };

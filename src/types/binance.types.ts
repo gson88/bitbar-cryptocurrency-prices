@@ -18,13 +18,13 @@ export interface AccountBalance {
 }
 
 export interface FixedBalance {
-  coin: string;
+  asset: string;
   free: number;
   locked: number;
 }
 
 export type CoinValue = {
-  coin: string;
+  asset: string;
   value: number;
   quantity: number;
 };
