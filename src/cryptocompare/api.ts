@@ -1,4 +1,4 @@
-import axios from 'axios';
+import fetch from 'node-fetch';
 import type { FullPriceAPIResponse } from '../types/api.types';
 
 const API_PRICEMULTI_URL =
@@ -9,8 +9,8 @@ export const getPrices = async (
   currency: string
 ): Promise<FullPriceAPIResponse> => {
   const url = getPriceMultiUrl(symbols, currency);
-  const { data } = await axios.get(url);
-  return data;
+  const response = await fetch(url);
+  return response.json();
 };
 
 const getPriceMultiUrl = (symbols: string[], currency: string): string => {

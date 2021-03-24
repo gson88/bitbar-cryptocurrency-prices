@@ -30,11 +30,7 @@ const getRowsWithBinance = async (
     throw new Error('Binance integration failed');
   }
 
-  // Remove ignored symbols
-  // Add additional symbols
-  symbols = symbols
-    .filter((symbol) => !appOptions.ignore.includes(symbol))
-    .concat(appOptions.symbols);
+  symbols = utils.addSymbolsFromOptions(symbols, appOptions);
 
   const priceData = await cryptoCompareAPI.getPrices(
     symbols,

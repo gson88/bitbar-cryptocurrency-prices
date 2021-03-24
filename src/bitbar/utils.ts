@@ -62,20 +62,6 @@ const getSymbolRows = async (
       color: RAW_CHANGEPCT24HOUR > 0 ? 'green' : 'red',
       size: smallerSize,
     },
-    // {
-    //   text: `${LOW24HOUR.replace(' ', '')} - ${HIGH24HOUR.replace(' ', '')}`,
-    //   // color: Number(CHANGEPCTHOUR) > 0 ? 'green' : 'red',
-    //   size: smallerSize,
-    // },
-    // {
-    //   text: `${LOW24HOUR.replace(' ', '')} (-${(
-    //     RAWPRICE - RAW_LOW24HOUR
-    //   ).toPrecision(2)}) - ${HIGH24HOUR.replace(' ', '')} (+${(
-    //     RAW_HIGH24HOUR - RAWPRICE
-    //   ).toPrecision(2)})`,
-    //   // color: Number(CHANGEPCTHOUR) > 0 ? 'green' : 'red',
-    //   size: smallerSize,
-    // },
   ];
 };
 
