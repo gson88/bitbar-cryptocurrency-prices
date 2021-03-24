@@ -6,3 +6,5 @@ package-lock.json
 dist/
 .DS_Store
 .env
+
+rebuild.sh
