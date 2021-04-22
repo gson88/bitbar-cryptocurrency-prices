@@ -10,6 +10,9 @@
 //   <xbar.var>string(VAR_BINANCE_API_KEY=""): Binance API Key.</xbar.var>
 //   <xbar.var>string(VAR_BINANCE_SECRET=""): Binance Secret.</xbar.var>
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 import bitbar from 'bitbar';
 import * as app from './app';
 import * as bitbarUtils from './bitbar/utils';
