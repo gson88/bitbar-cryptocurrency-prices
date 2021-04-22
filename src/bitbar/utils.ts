@@ -1,4 +1,4 @@
-import bitbar, { Options } from 'bitbar';
+import bitbar, { BitbarOptions, Options } from 'bitbar';
 import he from 'he';
 import type { Thread } from '../types/4chan.types';
 import type { BitbarRow, FullPriceAPIResponse } from '../types/api.types';
@@ -9,7 +9,9 @@ import * as options from '../options/options';
 const headerSize = 12;
 const smallerSize = 10;
 
-const getSymbolValueSubmenu = (userCoinValue: CoinValue | undefined) => {
+const getSymbolValueSubmenu = (
+  userCoinValue: CoinValue | undefined
+): (BitbarOptions | Options)[] | undefined => {
   if (!userCoinValue) {
     return;
   }
@@ -49,12 +51,14 @@ const getSymbolRows = async (
   const coinValue = coinValues?.[symbol];
   const symbolValueSubmenu = getSymbolValueSubmenu(coinValue);
 
-  const rows = [
+  const rows: (BitbarOptions | Options)[] = [
     {
       text: `${symbol}: ${DISPLAYPRICE.replace(' ', '')}`,
       color: 'white',
       size: headerSize,
-      submenu: symbolValueSubmenu,
+      ...(symbolValueSubmenu && {
+        submenu: symbolValueSubmenu,
+      }),
     },
     {
       text: `1h:   ${CHANGEPCTHOUR}%`,
@@ -68,45 +72,70 @@ const getSymbolRows = async (
     },
   ];
 
-  const interestingThreads = chanAPI.getThreadsThatInclude(threads, symbol);
+  const threadsSubmenu = get4chanThreadsSubmenu(threads, symbol);
+
+  if (threadsSubmenu) {
+    rows.push(threadsSubmenu);
+  }
+
+  return rows;
+};
+
+const get4chanThreadsSubmenu = (
+  threads: Thread[],
+  symbol: string
+): Options | null => {
+  const interestingThreads: Thread[] = chanAPI.getThreadsThatInclude(
+    threads,
+    symbol
+  );
 
   if (interestingThreads.length === 0) {
-    return rows;
+    return null;
   }
 
   const quote = /<span class="quote">(.+)<\/span>/g;
 
-  const submenu = interestingThreads.map((thread) => {
-    const threadHref = `https://boards.4channel.org/biz/thread/${thread.no}`;
-    const commentRows =
-      thread.com
-        ?.split('<br>')
-        .filter(Boolean)
-        .map((row) => he.decode(row).replace(quote, '$1')) || [];
+  const submenu = interestingThreads
+    .map<Options[]>((thread) => {
+      const threadHref = `https://boards.4channel.org/biz/thread/${thread.no}`;
+      const commentRows =
+        thread.com
+          ?.split('<br>')
+          .filter(Boolean)
+          .map((row) => he.decode(row).replace(quote, '$1')) || [];
 
-    const title = thread.sub
-      ? he.decode(thread.sub)
-      : commentRows[0] || '(No title and message)';
+      const title = thread.sub
+        ? he.decode(thread.sub)
+        : commentRows[0] || '(No title and message)';
 
-    return {
-      text: title.slice(0, 100).concat(` (${thread.replies})`),
-      size: headerSize,
-      href: threadHref,
-      submenu: commentRows.map((row) => ({
-        text: row.slice(0, 100),
-        size: headerSize,
-      })),
-    };
-  });
+      const threadRows: Options[] = [
+        {
+          text: title.concat(` (${thread.replies})`),
+          length: 100,
+          size: headerSize,
+          href: threadHref,
+        },
+      ];
 
-  rows.push({
+      return threadRows.concat(
+        commentRows.slice(0, 3).map((row) => ({
+          text: row,
+          length: 100,
+          size: smallerSize,
+        }))
+      );
+    })
+    .reduce((acc, curr) => {
+      return acc.concat(bitbar.separator as any, curr);
+    }, []);
+
+  return {
     text: `Threads (${interestingThreads.length})`,
     size: smallerSize,
     color: 'gray',
     submenu,
-  });
-
-  return rows;
+  };
 };
 
 export const getBitbarRows = async (params: {
@@ -119,7 +148,6 @@ export const getBitbarRows = async (params: {
   let rows: BitbarRow[] = [];
 
   for (let symbol of params.symbols) {
-    rows.push(bitbar.separator);
     const row = await getSymbolRows(
       symbol,
       params.currency,
@@ -127,7 +155,8 @@ export const getBitbarRows = async (params: {
       params.threads,
       params.coinValues
     );
-    rows = rows.concat(row);
+
+    rows = rows.concat(bitbar.separator, row);
   }
 
   // Remove submenu from first row
@@ -139,7 +168,7 @@ export const addOptionsMenu = (rows: BitbarRow[]) => {
   return rows.concat([getOptionsMenu(options.optionsPath)]);
 };
 
-export const getTotalWalletValueRow = (coinValues: UserCoinValues) => {
+export const getTotalWalletValueRow = (coinValues: UserCoinValues): Options => {
   const totalWalletValue = Object.values(coinValues).reduce(
     (acc, coinValue) => {
       return acc + coinValue.value;

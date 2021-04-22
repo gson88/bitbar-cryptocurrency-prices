@@ -49,7 +49,9 @@ const getRowsWithBinance = async (
   );
 
   const sortedSymbols = symbols.sort((a, b) => {
-    return coinValues[a]?.value > coinValues[b]?.value ? -1 : 1;
+    const value1 = coinValues[a]?.value || 0;
+    const value2 = coinValues[b]?.value || 0;
+    return value1 > value2 ? -1 : 1;
   });
 
   const rows = await bitbarUtils.getBitbarRows({

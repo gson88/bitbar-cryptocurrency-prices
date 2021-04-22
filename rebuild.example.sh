@@ -9,10 +9,10 @@ then
 fi
 
 rm -rf dist
-rm  ~/bitbar-scripts/plugins/cryptocurrency-prices.2m.js
+rm  ~/Library/Application\ Support/xbar/plugins/cryptocurrency-prices.2m.js
 yarn build
 chmod +x dist/main.2m.js
-ln -s dist/main.2m.js ~/bitbar-scripts/plugins/cryptocurrency-prices.2m.js
+ln -s dist/main.2m.js ~/Library/Application\ Support/xbar/plugins/cryptocurrency-prices.2m.js
 
 if [ $copy  == 1 ]
 then

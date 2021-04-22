@@ -17,11 +17,22 @@ export const getCatalogThreads = async (): Promise<Thread[]> => {
 };
 
 export const getThreadsThatInclude = (threads: Thread[], search: string) => {
-  return threads.filter((thread) => {
-    return (
-      thread.name?.includes(search) ||
-      thread.com?.includes(search) ||
-      thread.filename?.includes(search)
-    );
-  });
+  const lowerCaseSearch = search.toLocaleLowerCase();
+
+  return threads
+    .filter((thread) => {
+      return (
+        thread.name?.toLocaleLowerCase().includes(lowerCaseSearch) ||
+        thread.sub?.toLocaleLowerCase().includes(lowerCaseSearch) ||
+        thread.com?.toLocaleLowerCase().includes(lowerCaseSearch) ||
+        thread.filename?.toLocaleLowerCase().includes(lowerCaseSearch)
+      );
+    })
+    .map((thread) => ({
+      ...thread,
+      name: thread.name?.replace(/\|/g, 'I'),
+      com: thread.com?.replace(/\|/g, 'I'),
+      sub: thread.sub?.replace(/\|/g, 'I'),
+      filename: thread.filename?.replace(/\|/g, 'I'),
+    }));
 };

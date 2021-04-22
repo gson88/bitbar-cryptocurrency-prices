@@ -9,7 +9,7 @@ export interface Thread {
   name?: string; // Username
   sub?: string; // Title
   com?: string; // Message
-  filename: string;
+  filename?: string;
   ext: string;
   w: number;
   h: number;

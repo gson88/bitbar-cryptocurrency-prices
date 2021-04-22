@@ -9,8 +9,8 @@ import type {
 
 const BASE_URL = 'https://api.binance.com';
 const HEADER_API_KEY = 'X-MBX-APIKEY';
-const API_KEY = process.env.BINANCE_API_KEY as string;
-const SECRET = process.env.BINANCE_SECRET as string;
+const API_KEY = process.env.VAR_BINANCE_API_KEY as string;
+const SECRET = process.env.VAR_BINANCE_SECRET as string;
 
 export const hasEnvironmentKeys = () => {
   return Boolean(API_KEY && SECRET);

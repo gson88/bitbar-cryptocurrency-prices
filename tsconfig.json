@@ -11,7 +11,7 @@
     "noUnusedLocals": true,
     "baseUrl": "./src",
     "esModuleInterop": true,
-    "listEmittedFiles": true,
+    "listEmittedFiles": false,
     "importsNotUsedAsValues": "remove",
     "skipLibCheck": true,
     "noEmitOnError": false
