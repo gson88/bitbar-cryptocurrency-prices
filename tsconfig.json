@@ -8,7 +8,8 @@
     "strict": false,
     "strictNullChecks": true,
     "moduleResolution": "node",
-    "noUnusedLocals": true,
+    "downlevelIteration": true,
+    "noUnusedLocals": false,
     "baseUrl": "./src",
     "esModuleInterop": true,
     "listEmittedFiles": false,
@@ -16,5 +17,7 @@
     "skipLibCheck": true,
     "noEmitOnError": false
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
